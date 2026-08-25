@@ -38,7 +38,8 @@ class HBnBFacade:
         if not user:
             return None
         if "password" in user_data:
-            user_data["password_hash"] = user.hash_password(user_data.pop("password"))
+            user_data["password_hash"] = user.hash_password(
+                user_data.pop("password"))
         self.user_repo.update(user_id, user_data)
         return user
 
@@ -55,7 +56,11 @@ class HBnBFacade:
 
     def get_reviews_by_place(self, place_id):
         all_reviews = self.get_all_reviews()
-        return [r for r in all_reviews if getattr(r, "place_id", None) == place_id]
+        return [
+            r for r in all_reviews if getattr(
+                r,
+                "place_id",
+                None) == place_id]
 
     def update_review(self, review_id, review_data):
         review = self.get_review(review_id)
@@ -92,9 +97,28 @@ class HBnBFacade:
 
     def update_place(self, place_id, place_data):
         place = self.get_place(place_id)
+
         if not place:
             return None
+
+        if "amenities" in place_data:
+            amenity_ids = place_data.pop("amenities", [])
+            amenities = []
+
+            for amenity_id in amenity_ids:
+                amenity = self.amenity_repo.get(amenity_id)
+
+                if not amenity:
+                    raise ValueError(
+                        f"Amenity with id {amenity_id} not found"
+                    )
+
+                amenities.append(amenity)
+
+            place_data["amenities"] = amenities
+
         self.place_repo.update(place_id, place_data)
+
         return place
 
     def delete_place(self, place_id):

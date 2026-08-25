@@ -113,6 +113,19 @@ function fetchPlaces(token) {
       console.error(error);
     });
 }
+const placeImages = {
+    "Cozy Beachfront Villa": "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=320&h=200&q=80",
+    "Modern City Apartment": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=320&h=200&q=80", 
+    "Rustic Mountain Cabin": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=320&h=200&q=80",
+    "Luxury Penthouse Suite": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=320&h=200&q=80",
+    "Desert Glamping Tent": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=320&h=200&q=80", 
+    "Historic Old Town Loft": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=320&h=200&q=80",
+    "Lakeside Cottage": "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=320&h=200&q=80",
+    "Minimalist Tech Studio": "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=320&h=200&q=80",
+    "Tropical Treehouse": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=320&h=200&q=80",
+    "Spacious Family Home": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=320&h=200&q=80",
+    "Cozy Studio": "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=320&h=200&q=80" 
+  };
 
 function displayPlaces(places) {
   const placesList = document.querySelector('#places-list');
@@ -128,6 +141,14 @@ function displayPlaces(places) {
   places.forEach(function (place) {
     const placeCard = document.createElement('div');
     placeCard.className = 'place-card';
+
+    const image = document.createElement('img');
+    image.src = placeImages[place.title];
+    image.style.width = '100%';
+    image.style.height = '200px';
+    image.style.borderRadius = '10px 10px 0 0';
+    image.style.objectFit = 'cover';
+    placeCard.appendChild(image);
 
     const title = document.createElement('h2');
     title.textContent = place.title || 'Unnamed Place';
@@ -263,45 +284,64 @@ function displayPlaceDetails(place) {
 
   const title = document.createElement('h1');
   title.textContent = place.title || 'Unnamed Place';
+  title.className = 'details-title'; 
   placeDetailsSection.appendChild(title);
+
+  const image = document.createElement('img');
+  const placeName = place.title;
+  image.src = placeImages[placeName];
+  image.className = 'details-hero-image';
+  placeDetailsSection.appendChild(image);
 
   const infoDiv = document.createElement('div');
   infoDiv.className = 'place-info';
 
-  function createInfoLine(label, value) {
-    const p = document.createElement('p');
-    const strong = document.createElement('strong');
-    strong.textContent = label + ': ';
-    p.appendChild(strong);
-    p.appendChild(document.createTextNode(value));
-    return p;
-  }
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'details-meta';
 
   let hostName = 'Unknown';
   if (place.owner) {
     hostName = place.owner.first_name + ' ' + place.owner.last_name;
   }
-  infoDiv.appendChild(createInfoLine('Host', hostName));
 
-  infoDiv.appendChild(createInfoLine('Price per night', '$' + place.price));
+  const hostP = document.createElement('p');
+  hostP.innerHTML = 'Hosted by <strong>' + hostName + '</strong>';
 
-  infoDiv.appendChild(createInfoLine('Description', place.description || 'No description provided.'));
+  const priceP = document.createElement('p');
+  priceP.className = 'details-price';
+  priceP.innerHTML = '<strong>$' + place.price + '</strong> / night';
 
-  let amenitiesText = 'None';
+  metaDiv.appendChild(hostP);
+  metaDiv.appendChild(priceP);
+  infoDiv.appendChild(metaDiv);
+
+  const descDiv = document.createElement('div');
+  descDiv.className = 'details-section';
+  descDiv.innerHTML = '<h3>About this place</h3><p>' + (place.description || 'No description provided.') + '</p>';
+  infoDiv.appendChild(descDiv);
+
+  const amenitiesDiv = document.createElement('div');
+  amenitiesDiv.className = 'details-section';
+  amenitiesDiv.innerHTML = '<h3>What this place offers</h3>';
+
+  const tagsContainer = document.createElement('div');
+  tagsContainer.className = 'amenities-tags';
+
   if (place.amenities && place.amenities.length > 0) {
-    let amenityNames = [];
-    for (let i = 0; i < place.amenities.length; i++) {
-      const item = place.amenities[i];
-      if (typeof item === 'object' && item !== null) {
-        amenityNames.push(item.name);
-      } else {
-        amenityNames.push(item);
-      }
-    }
-    amenitiesText = amenityNames.join(', ');
+    place.amenities.forEach(function (item) {
+      const name = typeof item === 'object' && item !== null ? item.name : item;
+      
+      const span = document.createElement('span');
+      span.className = 'amenity-tag';
+      span.textContent = name;
+      tagsContainer.appendChild(span);
+    });
+  } else {
+    tagsContainer.innerHTML = '<p style="color: var(--text-muted);">No amenities listed.</p>';
   }
-
-  infoDiv.appendChild(createInfoLine('Amenities', amenitiesText));
+  
+  amenitiesDiv.appendChild(tagsContainer);
+  infoDiv.appendChild(amenitiesDiv);
 
   placeDetailsSection.appendChild(infoDiv);
 

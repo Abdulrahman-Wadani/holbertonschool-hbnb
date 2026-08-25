@@ -107,10 +107,11 @@ class PlaceResource(Resource):
                 "id": owner.id,
             }
 
-        place_dict["amenities"] = [amenity.to_dict() for amenity in place.amenities]
+        place_dict["amenities"] = [amenity.to_dict()
+                                   for amenity in place.amenities]
         return place_dict, 200
 
-    @api.expect(place_model)
+    @api.expect(place_update_model)
     @api.response(200, "Place updated successfully")
     @api.response(404, "Place not found")
     @api.response(400, "Invalid input data")
