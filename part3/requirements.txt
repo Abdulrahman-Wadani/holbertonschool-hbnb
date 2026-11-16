@@ -6,3 +6,4 @@ flask_restx
 sqlalchemy
 PyMySQL
 gunicorn
+Flask-Cors
